@@ -98,18 +98,32 @@ class RedmineConnection(object):
         if self.logged_in:
             self._logout()
 
-    def get(self, path, data=None):
+    def _get(self, path, data=None):
         with closing(self.open(path, data)) as f:
             return f.read()
 
     def _login(self, username, password):
-        self.get("login",
+        self._get("login",
                  urlencode({"username": username,
                             "password": password,
                             "login": "Login"}))
 
     def _logout(self):
-        self.get("logout")
+        self._get("logout")
+
+def redmine_issues(url, username, password):
+    """Return a generator over a list of dicts representing the issues"""
+    with closing(RedmineConnection(url, username, password)) as conn:
+        #with closing(conn.open("issues?format=csv")) as f:
+        #    open("issues.csv", "w").write(f.read())
+        with open("issues.csv") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                #sys.stderr.write('.')
+                #print row
+                row = dict([(k, unicode(v, 'utf-8', 'replace')) for
+                            (k, v) in row.iteritems()])
+                yield row
 
 #==============================================================================
 # logging
@@ -199,7 +213,7 @@ def sync_task(url, folder, projects, tasks,
             start_date = datetime.strptime(row['Start'], "%d %b %Y")
         estimated_minutes = k.missing_value
         if len(row['Estimated time']):
-            estimated_minutes = float(row['Estimated time']) * 60
+            estimated_minutes = int(round(float(row['Estimated time']) * 60))
         
         
         if assigned_to_me:
@@ -325,7 +339,7 @@ def existing_projects(folder, projects = None):
         existing_projects(f, projects)
     return projects
 
-def process(csvfile, url, folder_path, me,
+def process(rows, url, folder_path, me,
             available_path, waiting_path, assigned_path):
 
     doc = appscript.app('OmniFocus').default_document
@@ -337,18 +351,12 @@ def process(csvfile, url, folder_path, me,
     projects = existing_projects(folder)
 
     changed = []
-    
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-        #sys.stderr.write('.')
-        #print row
-        row = dict([(k, unicode(v, 'utf-8', 'replace')) for
-                    (k, v) in row.iteritems()])
+
+    for row in rows:
         changed_task = sync_task(url, folder, projects, tasks,
                                  available, waiting, assigned, me, row)
         if changed_task is not None:
             changed.append(changed_task)
-    #sys.stderr.write('\n')
 
     # Any existing tasks that were not seen must either have been
     # deleted or completed; we err on the side of caution, and set
@@ -377,9 +385,12 @@ class OptionParser(optparse.OptionParser):
         return self.get_description()
 
 def main():
-    parser = OptionParser(usage="usage: %prog [options] REDMINE-URL "
-                          "MY-NAME ISSUE-FOLDER-PATH "
-                          "ASSIGNED-CONTEXT-PATH WAITING-CONTEXT-PATH "
+    parser = OptionParser(usage="usage: %prog [options] "
+                          "REDMINE-URL "
+                          "MY-NAME "
+                          "ISSUE-FOLDER-PATH "
+                          "ASSIGNED-CONTEXT-PATH "
+                          "WAITING-CONTEXT-PATH "
                           "AVAILABLE-CONTEXT-PATH",
                           description=__doc__)
 
@@ -408,18 +419,16 @@ def main():
 
     (username, password) = (opts.username, opts.password)
 
-    #if True:
     log("status", "synchronising redmine...")
-    with closing(RedmineConnection(url, username, password)) as conn:
-        with closing(conn.open("issues?format=csv")) as f:
-        #    open("issues.csv", "w").write(f.read())
-        #with open("issues.csv") as f:
-            process(f, url,
-                    folder_path.split(':'),
-                    my_name,
-                    available_path.split(':'),
-                    waiting_path.split(':'),
-                    assigned_path.split(':'))
+
+    process(redmine_issues(url, username, password),
+            url,
+            folder_path.split(':'),
+            my_name,
+            available_path.split(':'),
+            waiting_path.split(':'),
+            assigned_path.split(':'))
+
     log("status", "synchronising redmine...done")
 
     return 0
