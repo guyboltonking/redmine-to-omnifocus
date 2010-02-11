@@ -81,12 +81,6 @@ from urlparse import urljoin
 import cookielib
 from contextlib import closing
 
-def get_csv_from_redmine(url):
-    stream = urllib2.urlopen(urlparse.urljoin(url, "issues?format=csv"))
-    result = stream.read()
-    stream.close()
-    return result
-
 class RedmineConnection(object):
     def __init__(self, redmine_url, username=None, password=None):
         self.url = redmine_url 
@@ -224,8 +218,8 @@ def sync_task(url, folder, projects, tasks,
             # estimated_minutes is sometimes 0, sometimes k.missing_value.
             # No idea why.  Anyway, we bodge comparisons so that 0 and
             # k.missing_value are considered equal.
-            if (prop.get() == 0 and val == k.missing_value) or \
-               (prop.get() == k.missing_value and val == 0):
+            if (val == k.missing_value and prop.get() == 0) or \
+               (val == 0 and prop.get() == k.missing_value):
                 return
             
             if prop.get() != val:
