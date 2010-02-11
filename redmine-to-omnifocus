@@ -114,9 +114,9 @@ class RedmineConnection(object):
 def redmine_issues(url, username, password):
     """Return a generator over a list of dicts representing the issues"""
     with closing(RedmineConnection(url, username, password)) as conn:
-        #with closing(conn.open("issues?format=csv")) as f:
+        with closing(conn.open("issues?format=csv")) as f:
         #    open("issues.csv", "w").write(f.read())
-        with open("issues.csv") as f:
+        #with open("issues.csv") as f:
             reader = csv.DictReader(f)
             for row in reader:
                 #sys.stderr.write('.')
