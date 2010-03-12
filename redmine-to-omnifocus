@@ -80,6 +80,7 @@ from urllib import urlencode
 from urlparse import urljoin
 import cookielib
 from contextlib import closing
+from BeautifulSoup import BeautifulSoup
 
 class RedmineConnection(object):
     def __init__(self, redmine_url, username=None, password=None):
@@ -103,10 +104,20 @@ class RedmineConnection(object):
             return f.read()
 
     def _login(self, username, password):
-        self._get("login",
-                 urlencode({"username": username,
-                            "password": password,
-                            "login": "Login"}))
+        data = {"username": username,
+                "password": password,
+                "login": "Login"}
+
+        # If there's an authenticity token involved (introduced in
+        # recent versions of redmine) then get it and submit it with the
+        # login details
+        loginform = self._get("login")
+        soup = BeautifulSoup(loginform)
+        token = soup.find(attrs={'name': 'authenticity_token'})
+        if token is not None:
+            data['authenticity_token'] = token['value']
+        
+        self._get("login", urlencode(data))
 
     def _logout(self):
         self._get("logout")
