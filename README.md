@@ -1,3 +1,22 @@
+Dependencies
+============
+
+To use this script you'll need:
+
+* Python >= 2.6
+* BeautifulSoup >= 3.0
+
+BeautifulSoup can be installed using setuptools:
+
+* Install [setuptools](http://pypi.python.org/pypi/setuptools)
+* Run `sudo easy_install BeautifulSoup`
+
+Usage
+=====
+
+Here's the output from `redmine-to-omnifocus --help`:
+
+<pre>
 Usage: redmine-to-omnifocus [options] REDMINE-URL MY-NAME ISSUE-FOLDER-PATH ASSIGNED-CONTEXT-PATH WAITING-CONTEXT-PATH AVAILABLE-CONTEXT-PATH
 
 Logs into the REDMINE-URL, retrieves the open issues, and inserts
@@ -78,3 +97,4 @@ Options:
   --username=USERNAME  Login as USERNAME
   --password=PASSWORD  Login with PASSWORD
   --use-growl          Use growl for notifications
+</pre>
