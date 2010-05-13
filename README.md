@@ -3,7 +3,7 @@ Dependencies
 
 To use this script you'll need:
 
-* Python >= 2.6
+* Python >= 2.6 < 3.0
 * BeautifulSoup >= 3.0
 
 BeautifulSoup can be installed using setuptools:
