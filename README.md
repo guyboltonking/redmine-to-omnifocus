@@ -3,9 +3,9 @@ Dependencies
 
 To use this script you'll need:
 
-* Python(http://python.org) >= 2.6 < 3.0
-* BeautifulSoup(http://www.crummy.com/software/BeautifulSoup) >= 3.0
-* appscript(http://appscript.sourceforge.net/py-appscript/index.html) >= 0.20.0
+* [Python](http://python.org) >= 2.6 < 3.0
+* [BeautifulSoup](http://www.crummy.com/software/BeautifulSoup) >= 3.0
+* [appscript](http://appscript.sourceforge.net/py-appscript/index.html) >= 0.20.0
 
 BeautifulSoup and appscript can be installed using setuptools:
 
