@@ -13,6 +13,13 @@ BeautifulSoup and appscript can be installed using setuptools:
 * Run `sudo easy_install BeautifulSoup`
 * Run `sudo easy_install appscript`
 
+Branches
+========
+
+Note that you should use the redmine-1.2 branch if you're using
+redmine-1.2, as the CSV column names appear to have changed (thanks to
+FatherShawn for the patch).
+
 Usage
 =====
 
