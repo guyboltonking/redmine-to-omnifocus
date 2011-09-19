@@ -47,7 +47,8 @@ will be overwritten on subsequent imports.
 
 To use it, you should set the "Issues export limit" in Redmine's
 "Issue Tracking" Settings tab to a high enough value such that all
-issues are exported.
+issues are exported. The script also expects the date format to be set in
+Redmine on the Display tab in Settings to the dd Mmm YYYY format, such as 19 Sep 2011
 
 The requirements are:
  
