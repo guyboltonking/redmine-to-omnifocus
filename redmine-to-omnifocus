@@ -190,7 +190,7 @@ def sync_task(url, folder, projects, tasks,
             del tasks[id]
         return t
 
-    assigned_to_me = re.match(me, row['Assigned to'], re.I) is not None
+    assigned_to_me = re.match(me, row['Assignee'], re.I) is not None
     
     p = projects.get(row['Project'])
     t = get_existing_task(tasks, int(row['#']))
@@ -212,16 +212,16 @@ def sync_task(url, folder, projects, tasks,
         name = "#%s: %s" % (row['#'], row['Subject'])
         note = "%s\n\nAssigned to: %s\tStatus: %s\n\n%s" % \
                (urljoin(url, "issues/show/" + row['#']),
-                row['Assigned to'],
+                row['Assignee'],
                 row['Status'],
-                row['Description'].replace("\r\n","\n").replace("\r","\n"))
+                row['Subject'].replace("\r\n","\n").replace("\r","\n"))
         context = waiting
         due_date = k.missing_value
         if len(row['Due date']):
             due_date = datetime.strptime(row['Due date'], "%d %b %Y")
         start_date = k.missing_value
-        if len(row['Start']):
-            start_date = datetime.strptime(row['Start'], "%d %b %Y")
+        if len(row['Start date']):
+            start_date = datetime.strptime(row['Start date'], "%d %b %Y")
         estimated_minutes = k.missing_value
         if len(row['Estimated time']):
             estimated_minutes = int(round(float(row['Estimated time']) * 60))
@@ -229,7 +229,7 @@ def sync_task(url, folder, projects, tasks,
         
         if assigned_to_me:
             context = assigned
-        elif not len(row['Assigned to']):
+        elif not len(row['Assignee']):
             context = available
         else:
             # Don't assign a due date to items that we can't do anything
