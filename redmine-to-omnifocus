@@ -159,7 +159,7 @@ def console_log(type, msg):
 log = console_log
 
 def use_growl_logger():
-    from Growl import GrowlNotifier
+    from gntp.notifier import GrowlNotifier
     growl = GrowlNotifier(applicationName='redmine-to-omnifocus',
                           notifications=[STATUS, CHANGED, COMPLETED],
                           hostname='localhost', password='')
