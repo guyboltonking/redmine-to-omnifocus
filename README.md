@@ -8,12 +8,11 @@ script by running:
 
 ...to install for all users.
 
-Branches
-========
+Redmine 1.2
+===========
 
-Note that you should use the redmine-1.2 branch if you're using
-redmine-1.2, as the CSV column names appear to have changed (thanks to
-FatherShawn for the patch).
+The script should now handle the changed CSV column names in Redmine
+1.2, although I've been unable to test this.
 
 Usage
 =====
