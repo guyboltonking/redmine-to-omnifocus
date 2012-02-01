@@ -1,17 +1,12 @@
-Dependencies
+Installation
 ============
 
-To use this script you'll need:
+You should be able to download all the dependencies and install the
+script by running:
 
-* [Python](http://python.org) >= 2.6 < 3.0
-* [BeautifulSoup](http://www.crummy.com/software/BeautifulSoup) >= 3.0
-* [appscript](http://appscript.sourceforge.net/py-appscript/index.html) >= 0.20.0
+    $ sudo python setup.py install
 
-BeautifulSoup and appscript can be installed using setuptools:
-
-* Install [setuptools](http://pypi.python.org/pypi/setuptools)
-* Run `sudo easy_install BeautifulSoup`
-* Run `sudo easy_install appscript`
+...to install for all users.
 
 Branches
 ========
