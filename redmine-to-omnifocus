@@ -26,8 +26,9 @@ will be overwritten on subsequent imports.
 
 To use it, you should set the "Issues export limit" in Redmine's
 "Issue Tracking" Settings tab to a high enough value such that all
-issues are exported. The script also expects the date format to be set in
-Redmine on the Display tab in Settings to the dd Mmm YYYY format, such as 19 Sep 2011
+issues are exported. The script also expects the date format to be set
+in Redmine on the Display tab in Settings to the DD MMM YYYY format,
+such as 19 Sep 2011.
 
 The requirements are:
  
@@ -123,6 +124,16 @@ class RedmineConnection(object):
     def _logout(self):
         self._get("logout")
 
+def redmine_12_fields(row):
+    """Patch redmine 1.2 fields into pre-1.2 format"""
+    if 'Assignee' in row:
+        row['Assigned to'] = row['Assignee']
+    if 'Subject' in row:
+        row['Description'] = row['Subject']
+    if 'Start date' in row:
+        row['Start'] = row['Start date']
+    return row
+
 def redmine_issues(url, username, password):
     """Return a generator over a list of dicts representing the issues"""
     with closing(RedmineConnection(url, username, password)) as conn:
@@ -135,6 +146,7 @@ def redmine_issues(url, username, password):
                 #print row
                 row = dict([(k, unicode(v, 'utf-8', 'replace')) for
                             (k, v) in row.iteritems()])
+                row = redmine_12_fields(row)
                 yield row
 
 #==============================================================================
