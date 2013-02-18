@@ -134,16 +134,13 @@ def redmine_12_fields(row):
         row['Start'] = row['Start date']
     return row
 
-def redmine_issues(url, username, password):
+def redmine_issues(url, username, password, redmine_issues_url):
     """Return a generator over a list of dicts representing the issues"""
     with closing(RedmineConnection(url, username, password)) as conn:
-        with closing(conn.open("issues?format=csv")) as f:
-        #    open("issues.csv", "w").write(f.read())
-        #with open("issues.csv") as f:
+    
+        with closing(conn.open(redmine_issues_url)) as f:
             reader = csv.DictReader(f)
             for row in reader:
-                #sys.stderr.write('.')
-                #print row
                 row = dict([(k, unicode(v, 'utf-8', 'replace')) for
                             (k, v) in row.iteritems()])
                 row = redmine_12_fields(row)
@@ -195,7 +192,7 @@ import sys
 from datetime import datetime
 
 def sync_task(url, folder, projects, tasks,
-              available, waiting, assigned, me, row):
+              available, waiting, assigned, me, row, date_format):
 
     def get_existing_task(tasks, id):
         t = tasks.get(id)
@@ -230,11 +227,12 @@ def sync_task(url, folder, projects, tasks,
                 row['Description'].replace("\r\n","\n").replace("\r","\n"))
         context = waiting
         due_date = k.missing_value
+
         if len(row['Due date']):
-            due_date = datetime.strptime(row['Due date'], "%d %b %Y")
+            due_date = datetime.strptime(row['Due date'], date_format)
         start_date = k.missing_value
         if len(row['Start']):
-            start_date = datetime.strptime(row['Start'], "%d %b %Y")
+            start_date = datetime.strptime(row['Start'], date_format)
         estimated_minutes = k.missing_value
         if len(row['Estimated time']):
             estimated_minutes = int(round(float(row['Estimated time']) * 60))
@@ -364,7 +362,7 @@ def existing_projects(folder, projects = None):
     return projects
 
 def process(rows, url, folder_path, me,
-            available_path, waiting_path, assigned_path):
+            available_path, waiting_path, assigned_path, date_format):
 
     doc = appscript.app('OmniFocus').default_document
     folder = of_folder(doc, folder_path)
@@ -378,7 +376,7 @@ def process(rows, url, folder_path, me,
 
     for row in rows:
         changed_task = sync_task(url, folder, projects, tasks,
-                                 available, waiting, assigned, me, row)
+                                 available, waiting, assigned, me, row, date_format)
         if changed_task is not None:
             changed.append(changed_task)
 
@@ -422,6 +420,17 @@ def main():
     parser.add_option('--password', help="Login with PASSWORD")
     parser.add_option('--use-growl', help="Use growl for notifications",
                       action="store_true", default=False)
+    issues_url_default = 'issues?format=csv'
+    parser.add_option('--issues-url', help = '''Use an alternate url to pull 
+issues from Redmine. Allows for setting filters in the query string. Defaults 
+to %s.''' % issues_url_default,
+        default = issues_url_default,
+    )
+    date_format_default = '%d %b %Y'
+    parser.add_option('--date-format', help = '''Date format served by Redmine.
+ Defaults to %s''' % date_format_default,
+        default = date_format_default,
+    )
 
     opts, args = parser.parse_args()
 
@@ -445,13 +454,14 @@ def main():
 
     log("status", "synchronising redmine...")
 
-    process(redmine_issues(url, username, password),
+    process(redmine_issues(url, username, password, opts.issues_url),
             url,
             folder_path.split(':'),
             my_name,
             available_path.split(':'),
             waiting_path.split(':'),
-            assigned_path.split(':'))
+            assigned_path.split(':'),
+            opts.date_format)
 
     log("status", "synchronising redmine...done")
 

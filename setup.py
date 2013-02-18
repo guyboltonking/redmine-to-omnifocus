@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name='redmine-to-omnifocus',
-      version='1.0',
+      version='1.1',
       description='Import Redmine issues into OmniFocus',
       author='Guy Bolton King',
       author_email='guy@waftex.com',
